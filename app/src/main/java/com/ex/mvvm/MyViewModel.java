@@ -22,7 +22,7 @@ public class MyViewModel extends BaseViewModel {
         setIsLoading(false);
     }
 
-        // 上面那种方法的 平替。
+        // 上面那种方法的 平替。(可以理解为模拟网络请求)
 //    public void loadData() {
 //        setIsLoading(true);
 //
