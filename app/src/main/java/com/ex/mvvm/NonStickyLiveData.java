@@ -10,19 +10,31 @@ import androidx.lifecycle.Observer;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+
+
+/**
+ *
+ *    通过这样的方式能够每次发送setvalue 方法的时候 ，修改这次
+ *
+ *
+ * */
 public class NonStickyLiveData<T> extends MutableLiveData<T> {
 
-    private AtomicBoolean mPending = new AtomicBoolean(false);
+    private AtomicBoolean mPending = new AtomicBoolean(true);
     private final Handler mHandler = new Handler(Looper.getMainLooper());
+
+
+    // 通过这样的方式能够每次发送setvalue 方法的时候 ，修改这次
+    private boolean mExpect = true;  // 预期值
+    private boolean mpUdata = false;  // 原值
 
     @MainThread
     public void observe(LifecycleOwner owner, final Observer<? super T> observer) {
-
         // Observe the internal MutableLiveData
         super.observe(owner, new Observer<T>() {
             @Override
             public void onChanged(T t) {
-                if (mPending.compareAndSet(true, false)) {
+                if (mPending.compareAndSet(mExpect, mpUdata)) {
                     observer.onChanged(t);
                 }
             }
@@ -40,8 +52,16 @@ public class NonStickyLiveData<T> extends MutableLiveData<T> {
         });
     }
 
-    @MainThread
-    public void call() {
-        setValue(null);
+
+    //  这个方法没什么用。。。
+//    @MainThread
+//    public void call() {
+//        setValue(null);
+//    }
+
+
+    public void setLastCompareAndSet(boolean expect, boolean updata) {
+        mExpect = expect;
+        mpUdata = updata;
     }
 }

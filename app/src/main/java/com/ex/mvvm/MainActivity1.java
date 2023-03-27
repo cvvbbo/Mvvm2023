@@ -7,8 +7,12 @@ import android.util.Log;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public class MainActivity1 extends AppCompatActivity {
 
+
+    private AtomicBoolean exists = new AtomicBoolean(true);
 
 
     /****
@@ -49,12 +53,6 @@ public class MainActivity1 extends AppCompatActivity {
         });
 
 
-//        new Handler().postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//            }
-//        },1000);
-
         // Simulate data changes
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -64,22 +62,60 @@ public class MainActivity1 extends AppCompatActivity {
         }, 2000);
 
 
-
-
-
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mLiveData.call();
-            }
-        }, 5000);
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                mLiveData.call();
+//            }
+//        }, 5000);
 
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
+                mLiveData.setLastCompareAndSet(true,true);   // 恢复粘性
                 mLiveData.setValue("Data 2");
             }
         }, 8000);
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mLiveData.setLastCompareAndSet(true,false);   // 解除粘性。
+                mLiveData.setValue("Data 3");
+            }
+        }, 9000);
+
+        AtomaticTest atomatic1 = new AtomaticTest("bar1");
+        AtomaticTest atomatic2 = new AtomaticTest("bar2");
+        new Thread(atomatic1).start();
+        new Thread(atomatic2).start();
+
     }
+
+
+    public class AtomaticTest implements Runnable {
+
+        private String name;
+        public AtomaticTest(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public void run() {
+            if (exists.compareAndSet(false, true)) {
+                System.out.println(name + ":enter");
+                try {
+                    Thread.sleep(2);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                System.out.println(name + ":leave");
+                exists.set(false);
+            } else {
+                System.out.println(name + ":give up");
+            }
+        }
+    }
+
 }
 
