@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class MainActivity1 extends AppCompatActivity {
 
 
+    //  这个和里面的api 还是有点相关的。  expect 这个值有点关系，如果这里面值能和那个对应上
     private AtomicBoolean exists = new AtomicBoolean(true);
 
 
@@ -72,7 +73,7 @@ public class MainActivity1 extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                mLiveData.setLastCompareAndSet(true,true);   // 恢复粘性
+                mLiveData.setLastCompareAndSet(true,true);   // 恢复粘性，粘性就是默认的
                 mLiveData.setValue("Data 2");
             }
         }, 8000);
